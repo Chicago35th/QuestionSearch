@@ -5,29 +5,37 @@ on: [push]
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 40
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-
+      
     - name: Setup Python
       uses: actions/setup-python@v5
       with:
         python-version: "3.11"
-
-    - name: Install Buildozer
+        
+    - name: Install dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y python3-pip zlib1g-dev
-        pip install buildozer
-
+        sudo apt-get install -y \
+            python3-pip \
+            zlib1g-dev \
+            libffi-dev \
+            libssl-dev \
+            libjpeg-dev \
+            libxml2-dev \
+            libxslt1-dev
+        pip install Cython==3.0.8 buildozer==1.5.0
+        
     - name: Build APK
       run: |
+        buildozer android clean
         buildozer android debug
         mkdir apk
         cp bin/*.apk apk/
-
+        
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
